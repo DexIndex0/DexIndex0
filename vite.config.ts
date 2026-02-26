@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   // Use relative base for GH Pages subfolder compatibility
-  base: './',
+  base: '/DexIndex0/',
   build: {
     outDir: 'dist',
     rollupOptions: {
