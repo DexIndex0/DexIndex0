@@ -99,7 +99,7 @@ export const Home: React.FC<HomeProps> = ({ onLaunch }) => {
         {/* Discord & Support Section */}
         <div className="w-full max-w-2xl flex flex-col gap-4 animate-fade-in-up mb-8" style={{ animationDelay: '0.5s' }}>
            <a 
-             href="https://discord.gg/DX53kQSYJr" 
+             href="https://discord.gg/3ZZncpwDxw" 
              target="_blank" 
              rel="noopener noreferrer"
              className="bg-indigo-600/20 border border-indigo-500/30 rounded-2xl p-4 flex items-center justify-between hover:bg-indigo-600/30 transition-colors group"

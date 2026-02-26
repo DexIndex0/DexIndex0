@@ -484,6 +484,19 @@ export const PokemonDetail: React.FC<PokemonDetailProps> = ({ pokemon, onClose }
               </div>
             )}
           </div>
+
+          {/* Footer Close Button */}
+          <div className="p-6 border-t border-white/5 bg-slate-900/80 backdrop-blur-sm sticky bottom-0 z-20">
+            <button 
+              onClick={onClose}
+              className="w-full py-4 bg-slate-800 hover:bg-dex-red text-white font-black uppercase tracking-[0.2em] rounded-2xl transition-all active:scale-95 shadow-xl border border-white/10 flex items-center justify-center gap-3 group"
+            >
+              <span>Exit Menu</span>
+              <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>
