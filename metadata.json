@@ -1,0 +1,5 @@
+{
+  "name": "DexIndex",
+  "description": "A next-generation Pokedex powered by PokeAPI for comprehensive Pokemon data and statistics.",
+  "requestFramePermissions": []
+}
