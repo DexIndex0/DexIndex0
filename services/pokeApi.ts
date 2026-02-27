@@ -390,7 +390,7 @@ export const fetchAllPokemonInCollection = async (
   console.log("Fetching fresh data via GraphQL...");
   
   const allNames = POKEMON_COLLECTION_NAMES.map(n => normalizePokemonName(n));
-  const BATCH_SIZE = 50; 
+  const BATCH_SIZE = 100; 
   const batches: string[][] = [];
   
   for (let i = 0; i < allNames.length; i += BATCH_SIZE) {
@@ -401,7 +401,7 @@ export const fetchAllPokemonInCollection = async (
   let completedCount = 0;
   
   // Execute in waves
-  const CONCURRENCY = 6;
+  const CONCURRENCY = 10;
 
   for (let i = 0; i < batches.length; i += CONCURRENCY) {
     const currentBatches = batches.slice(i, i + CONCURRENCY);

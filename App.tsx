@@ -18,10 +18,36 @@ const App: React.FC = () => {
   const [selectedPokemon, setSelectedPokemon] = useState<PokemonDetails | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [showIntro, setShowIntro] = useState(true);
+  
+  // Incremental rendering for performance
+  const [displayLimit, setDisplayLimit] = useState(100);
+
+  const filteredPokemon = useMemo(() => {
+    const term = searchTerm.toLowerCase().trim();
+    if (!term) return pokemonList;
+    return pokemonList.filter(p => 
+      p.name.toLowerCase().includes(term) || 
+      p.id.toString() === term ||
+      (p.customId && p.customId.toString().padStart(4, '0').includes(term))
+    );
+  }, [pokemonList, searchTerm]);
+
+  // Aggressive background loading
+  useEffect(() => {
+    if (view !== 'dex' || loading || displayLimit >= filteredPokemon.length) return;
+
+    const timer = setTimeout(() => {
+      setDisplayLimit(prev => Math.min(prev + 250, filteredPokemon.length));
+    }, 50);
+
+    return () => clearTimeout(timer);
+  }, [view, loading, displayLimit, filteredPokemon.length]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
-  }, [view]);
+    // Reset display limit when switching views or searching
+    setDisplayLimit(100);
+  }, [view, searchTerm]);
 
   useEffect(() => {
     let isMounted = true;
@@ -59,16 +85,6 @@ const App: React.FC = () => {
     loadPokemon();
     return () => { isMounted = false; };
   }, []);
-
-  const filteredPokemon = useMemo(() => {
-    const term = searchTerm.toLowerCase().trim();
-    if (!term) return pokemonList;
-    return pokemonList.filter(p => 
-      p.name.toLowerCase().includes(term) || 
-      p.id.toString() === term ||
-      (p.customId && p.customId.toString().padStart(4, '0').includes(term))
-    );
-  }, [pokemonList, searchTerm]);
 
   return (
     <div className="min-h-screen bg-slate-900 flex flex-col font-sans relative overflow-hidden selection:bg-dex-red selection:text-white">
@@ -148,12 +164,18 @@ const App: React.FC = () => {
               ) : (
                 <>
                   <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 content-visibility-auto">
-                    {filteredPokemon.map((pokemon) => (
+                    {filteredPokemon.slice(0, displayLimit).map((pokemon) => (
                       <div key={pokemon.id} className="animate-fade-in">
                         <PokemonCard pokemon={pokemon} onClick={setSelectedPokemon} />
                       </div>
                     ))}
                   </div>
+                  
+                  {displayLimit < filteredPokemon.length && (
+                    <div className="flex justify-center py-12">
+                       <div className="w-8 h-8 border-4 border-slate-800 border-t-dex-red rounded-full animate-spin"></div>
+                    </div>
+                  )}
                   
                   {filteredPokemon.length === 0 && !loading && (
                     <div className="text-center py-20">

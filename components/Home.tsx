@@ -8,11 +8,7 @@ interface HomeProps {
 export const Home: React.FC<HomeProps> = ({ onLaunch }) => {
   
   const handleLaunch = () => {
-    // Wrap in timeout to allow the button click animation/state to render 
-    // before the heavy main thread work of mounting the Dex view begins.
-    setTimeout(() => {
-      onLaunch();
-    }, 10);
+    onLaunch();
   };
 
   return (

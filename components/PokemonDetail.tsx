@@ -454,7 +454,7 @@ export const PokemonDetail: React.FC<PokemonDetailProps> = ({ pokemon, onClose }
             )}
 
             {activeTab === 'evolution' && (
-              <div className="h-full flex flex-col items-center justify-center animate-fade-in-up">
+              <div className="h-full flex flex-col items-center justify-start animate-fade-in-up py-8">
                  {!species ? (
                    <div className="w-10 h-10 border-4 border-dex-blue border-t-transparent rounded-full animate-spin"></div>
                  ) : !evolutionChain ? (

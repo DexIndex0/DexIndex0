@@ -7,7 +7,7 @@ interface PokemonCardProps {
   onClick: (pokemon: PokemonDetails) => void;
 }
 
-export const PokemonCard: React.FC<PokemonCardProps> = ({ pokemon, onClick }) => {
+export const PokemonCard = React.memo(({ pokemon, onClick }: PokemonCardProps) => {
   // Pad ID with zeros, prioritize customId if it exists
   const displayId = pokemon.customId || pokemon.id;
   const idStr = `#${displayId.toString().padStart(4, '0')}`;
@@ -50,4 +50,4 @@ export const PokemonCard: React.FC<PokemonCardProps> = ({ pokemon, onClick }) =>
       </div>
     </div>
   );
-};
+});
