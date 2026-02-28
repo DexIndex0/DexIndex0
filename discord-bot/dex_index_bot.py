@@ -1,63 +1,84 @@
 import discord
+from discord.ext import commands
 import requests
-import json
-from discord.ext import commands, tasks
+import logging
 
-TOKEN = 'YOUR_DISCORD_BOT_TOKEN'
-GITHUB_REPO = "DexIndex0/DexIndex0"
-GITHUB_API_URL = f"https://api.github.com/repos/{GITHUB_REPO}"
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 
-intents = discord.Intents.default()
-intents.messages = True
-intents.guilds = True
+# Discord bot configuration
+bot = commands.Bot(command_prefix='!')
 
-bot = commands.Bot(command_prefix='!', intents=intents)
+# GitHub API configuration
+github_api_url = 'https://api.github.com/'
+repository_owner = 'DexIndex0'
+repository_name = 'DexIndex0'
+
+# PokéAPI URL for Pokémon data
+pokeapi_url = 'https://pokeapi.co/api/v2/pokemon/'
 
 @bot.event
 async def on_ready():
-    print(f'Logged in as {bot.user.name} ({bot.user.id})')
-    print('------')
+    logging.info(f'{bot.user} has connected to Discord!')
 
-@tasks.loop(minutes=10)
-async def check_repo_updates():
-    # Fetch the latest commits
-    response = requests.get(f"{GITHUB_API_URL}/commits")
-    if response.status_code == 200:
-        commits = response.json()
-        latest_commit = commits[0]['commit']['message']
-        channel = bot.get_channel(YOUR_CHANNEL_ID)  # replace with your channel ID
-        await channel.send(f"New commit in {GITHUB_REPO}: {latest_commit}")
-
-@bot.command()
-async def pokedex(ctx, *, pokemon_name: str):
-    # Fetch Pokémon data from an API (replace with actual API URL)
-    response = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon_name.lower()}")
-    if response.status_code == 200:
-        data = response.json()
-        await ctx.send(f"{data['name'].capitalize()} - Height: {data['height']}, Weight: {data['weight']}")
-    else:
-        await ctx.send("Pokémon not found!")
-
-@bot.command()
-async def issues(ctx):
-    response = requests.get(f"{GITHUB_API_URL}/issues")
-    if response.status_code == 200:
+@bot.command(name='issues')
+async def fetch_issues(ctx):
+    try:
+        response = requests.get(f'{github_api_url}repos/{repository_owner}/{repository_name}/issues')
         issues = response.json()
-        issue_list = "\n".join([f"Issue #{issue['number']}: {issue['title']}" for issue in issues])
-        await ctx.send(f"Issues in {GITHUB_REPO}:\n{issue_list}")
-    else:
-        await ctx.send("Failed to fetch issues.")
+        if not issues:
+            await ctx.send('No issues found.')
+            return
+        for issue in issues:
+            await ctx.send(f'Issue #{issue['number']}: {issue['title']} - {issue['html_url']}')
+    except Exception as e:
+        logging.error(f'Error fetching issues: {e}')
+        await ctx.send('An error occurred while fetching issues.')
 
-@bot.command()
-async def pr(ctx):
-    response = requests.get(f"{GITHUB_API_URL}/pulls")
-    if response.status_code == 200:
+@bot.command(name='prs')
+async def fetch_prs(ctx):
+    try:
+        response = requests.get(f'{github_api_url}repos/{repository_owner}/{repository_name}/pulls')
         prs = response.json()
-        pr_list = "\n".join([f"PR #{pr['number']}: {pr['title']}" for pr in prs])
-        await ctx.send(f"Open Pull Requests in {GITHUB_REPO}:\n{pr_list}")
-    else:
-        await ctx.send("Failed to fetch pull requests.")
+        if not prs:
+            await ctx.send('No pull requests found.')
+            return
+        for pr in prs:
+            await ctx.send(f'PR #{pr['number']}: {pr['title']} - {pr['html_url']}')
+    except Exception as e:
+        logging.error(f'Error fetching PRs: {e}')
+        await ctx.send('An error occurred while fetching pull requests.')
 
-check_repo_updates.start()
+@bot.command(name='pokedex')
+async def poke_lookup(ctx, *, pokemon_name: str):
+    try:
+        response = requests.get(f'{pokeapi_url}{pokemon_name}')
+        if response.status_code == 200:
+            poke_data = response.json()
+            await ctx.send(f'{poke_data['name'].capitalize()} - Height: {poke_data['height']}, Weight: {poke_data['weight']}')
+        else:
+            await ctx.send(f'Pokémon {pokemon_name} not found.')
+    except Exception as e:
+        logging.error(f'Error fetching Pokémon data: {e}')
+        await ctx.send('An error occurred while fetching Pokémon data.')
 
-bot.run(TOKEN)
+@bot.command(name='stats')
+async def repository_stats(ctx):
+    try:
+        response = requests.get(f'{github_api_url}repos/{repository_owner}/{repository_name}')
+        stats = response.json()
+        await ctx.send(f'Repository: {stats['name']}, Stars: {stats['stargazers_count']}, Forks: {stats['forks_count']}')
+    except Exception as e:
+        logging.error(f'Error fetching repository stats: {e}')
+        await ctx.send('An error occurred while fetching repository statistics.')
+
+@bot.event
+async def on_guild_channel_create(channel):
+    await channel.send('Channel created!')
+
+@bot.event
+async def on_guild_channel_delete(channel):
+    await channel.send('Channel deleted!')
+
+# Running the bot
+bot.run('YOUR_DISCORD_BOT_TOKEN')
