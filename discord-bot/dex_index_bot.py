@@ -81,4 +81,4 @@ async def on_guild_channel_delete(channel):
     await channel.send('Channel deleted!')
 
 # Running the bot
-bot.run('YOUR_DISCORD_BOT_TOKEN')
+bot.run('MTQ3NzE4Njk0NDIxMDQ0MDI1NA.GVFpTe.ZJrc8VugY6jpHs9rbw2qyCmi7nYadD_enTJu-0')
